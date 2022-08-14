@@ -1,22 +1,31 @@
 const dbClient = require("../db");
-
+const NotificationService = require("./notification");
+const SessionService = require("./session");
 class AuthService {
-    async login(username, password) {
+    async login(phone, otp) {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const cursor = db.collection("users").find({ username, password });
-
-            let match;
-
-            await cursor.forEach((item) => {
-                match = item;
-            });
-
-            if (!match) {
-                throw new Error("username and password didn't match");
+            const doc = await db.collection("users").findOne({ _id: phone });
+            if (!doc) {
+                throw new Error("Phone number not found");
             }
-            return true;
+            console.log(doc);
+
+            const notificationService = new NotificationService();
+            return await notificationService.sendOtp(phone, otp);
+        } catch (e) {
+            throw new Error(e.message);
+        } finally {
+            await dbClient.close();
+        }
+    }
+
+    async verify(otp, token) {
+        try {
+            const sessionService = new SessionService();
+            await sessionService.get(otp, token);
+            await sessionService.deleteOTP(otp, token);
         } catch (e) {
             throw new Error(e.message);
         }

@@ -2,9 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const authMiddleware = require("./middleware/auth");
-const generateAccessToken = require("./utils");
+const { generateAccessToken } = require("./utils");
+const validator = require("validator");
 const dbClient = require("./db");
 const AuthService = require("./services/auth");
+const SessionService = require("./services/session");
+const { getRandomInt } = require("./utils");
 const app = express();
 
 // parse application/x-www-form-urlencoded
@@ -28,23 +31,35 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-    const username = req.body?.username.trim();
-    const password = req.body?.password;
+    const phone = req.body?.phone?.trim();
     const authService = new AuthService();
 
     try {
-        if (!username || !password) {
-            throw new Error("invalid username or password in request");
+        if (!validator.isMobilePhone(phone, "bn-BD")) {
+            throw new Error("invalid phone number");
         }
-        await authService.login(username, password);
-        res.json({ token: generateAccessToken(username) });
+        const sessionService = new SessionService();
+        const otp = getRandomInt(1000, 10000).toString();
+        const token = generateAccessToken(phone);
+        await sessionService.save({ otp, token, phone });
+        //await authService.login(phone);
+        res.json({ token });
     } catch (e) {
         res.status(403).json({ error: e.message });
     }
-    // username, password get from req.body
-    // check with database if the username and password is valid
-    // If valid, then generate a token and send it as response
-    // otherwise, send a unauthorized error
+});
+
+app.post("/verify", async (req, res) => {
+    const otp = req.body?.otp?.trim();
+    const token = req.headers?.authorization?.split(" ")[1];
+
+    try {
+        const authService = new AuthService();
+        await authService.verify(otp, token);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 app.listen(process.env.PORT, () => {
