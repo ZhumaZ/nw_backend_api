@@ -7,6 +7,7 @@ const validator = require("validator");
 const dbClient = require("./db");
 const AuthService = require("./services/auth");
 const SessionService = require("./services/session");
+const UserService = require("./services/user");
 const { getRandomInt } = require("./utils");
 const app = express();
 
@@ -57,6 +58,33 @@ app.post("/verify", async (req, res) => {
         const authService = new AuthService();
         await authService.verify(otp, token);
         res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.post("/register", async (req, res) => {
+    const _id = req.body?._id?.trim();
+    const firstName = req.body?.firstName?.trim();
+    const lastName = req.body?.lastName?.trim();
+    const phone = req.body?.phone?.trim();
+    const password = req.body?.password?.trim();
+    const nid = req.body?.nid?.trim();
+    const role = req.body?.role?.trim();
+
+    const userService = new UserService();
+
+    try {
+        const user = await userService.save({
+            _id,
+            firstName,
+            lastName,
+            phone,
+            password,
+            nid,
+            role,
+        });
+        res.json({ user });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }

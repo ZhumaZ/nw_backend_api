@@ -13,14 +13,12 @@ class SessionService {
         }
     }
 
-    async get(otp, token) {
+    async get(query) {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
             const sessionsCollection = db.collection("sessions");
-            const query = { otp, token };
             const session = await sessionsCollection.findOne(query);
-
             if (!session) {
                 throw new Error("Invalid otp and token combination");
             }

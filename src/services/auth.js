@@ -24,7 +24,7 @@ class AuthService {
     async verify(otp, token) {
         try {
             const sessionService = new SessionService();
-            await sessionService.get(otp, token);
+            await sessionService.get({ otp, token });
             await sessionService.deleteOTP(otp, token);
         } catch (e) {
             throw new Error(e.message);
