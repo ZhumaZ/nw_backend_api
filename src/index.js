@@ -8,6 +8,7 @@ const dbClient = require("./db");
 const AuthService = require("./services/auth");
 const SessionService = require("./services/session");
 const UserService = require("./services/user");
+const DressService = require("./services/dress");
 const { getRandomInt } = require("./utils");
 const app = express();
 
@@ -85,6 +86,31 @@ app.post("/register", async (req, res) => {
             role,
         });
         res.json({ user });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.post("/dress", async (req, res) => {
+    const _id = req.body?._id?.trim();
+    const title = req.body?.title?.trim();
+    const image = req.body?.image?.trim();
+    const category = req.body?.category?.trim();
+    const time = req.body?.time?.trim();
+    const price = req.body?.price?.trim();
+
+    try {
+        const dressService = new DressService();
+        const dress = await dressService.save({
+            _id,
+            title,
+            image,
+            category,
+            time,
+            price,
+        });
+
+        res.json(dress);
     } catch (e) {
         res.status(500).json({ error: e.message });
     }

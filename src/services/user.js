@@ -5,7 +5,7 @@ class UserService {
     async save(user) {
         try {
             for (let key in user) {
-                if (key !== "nid" && !user[key]) {
+                if (key !== "_id" && key !== "nid" && !user[key]) {
                     throw new Error(`invalid ${key} property`);
                 }
 
