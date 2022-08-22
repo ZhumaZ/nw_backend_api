@@ -34,6 +34,7 @@ app.get("/", async (req, res) => {
 
 app.post("/login", async (req, res) => {
     const phone = req.body?.phone?.trim();
+    const password = req.body?.password;
     const authService = new AuthService();
 
     try {
@@ -44,7 +45,7 @@ app.post("/login", async (req, res) => {
         const otp = getRandomInt(1000, 10000).toString();
         const token = generateAccessToken(phone);
         await sessionService.save({ otp, token, phone });
-        //await authService.login(phone);
+        await authService.login(phone, otp, password);
         res.json({ token });
     } catch (e) {
         res.status(403).json({ error: e.message });
