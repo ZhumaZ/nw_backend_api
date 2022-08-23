@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const whitelistedRoutes = ["/login"];
+const whitelistedRoutes = ["/login", "/register"];
 
 const authMiddleware = (req, res, next) => {
     if (whitelistedRoutes.includes(req.url)) {

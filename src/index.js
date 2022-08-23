@@ -66,10 +66,8 @@ app.post("/verify", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-    const _id = req.body?._id?.trim();
-    const firstName = req.body?.firstName?.trim();
-    const lastName = req.body?.lastName?.trim();
-    const phone = req.body?.phone?.trim();
+    const _id = req.body?.phone?.trim();
+    const name = req.body?.name?.trim();
     const password = req.body?.password?.trim();
     const nid = req.body?.nid?.trim();
     const role = req.body?.role?.trim();
@@ -79,13 +77,11 @@ app.post("/register", async (req, res) => {
     try {
         const user = await userService.save({
             _id,
-            firstName,
-            lastName,
-            phone,
+            name,
             password,
             nid,
             role,
-        });
+        }, 'register');
         res.json({ user });
     } catch (e) {
         res.status(500).json({ error: e.message });

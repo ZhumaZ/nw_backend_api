@@ -2,56 +2,54 @@ const dbClient = require("../db");
 const ObjectId = require("mongodb").ObjectId;
 const validator = require("validator");
 class UserService {
-    async save(user) {
+    async save(user, type) {
         try {
             for (let key in user) {
-                if (key !== "_id" && key !== "nid" && !user[key]) {
+                if (key !== "nid" && !user[key]) {
                     throw new Error(`invalid ${key} property`);
                 }
-
-                if (key === "phone") {
+                if (key === "_id") {
                     if (!validator.isMobilePhone(user[key], "bn-BD")) {
                         throw new Error("invalid phone number");
                     }
-                    const userFromDB = await this.get({ phone: user[key] });
-                    console.log(
-                        ObjectId(user._id).toString() ===
-                            userFromDB._id.toString()
-                    );
-                    if (
-                        userFromDB &&
-                        ObjectId(user._id).toString() !==
-                            userFromDB._id.toString()
-                    ) {
-                        throw new Error(
-                            "User with this phone number already exists"
-                        );
-                    }
                 }
             }
-
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
             const usersCollection = db.collection("users");
-            let userFromDB;
-            if (user._id) {
+            const userIsPresent = await this.get({ _id: user._id });
+
+            console.log(userIsPresent)
+            if (userIsPresent) {
+                if(type === 'register') {
+                    throw new Error('user already exists!')
+                }
                 const id = user._id;
                 delete user._id;
-                const filter = { _id: ObjectId(id) };
+                const filter = { _id: id };
                 const updateDoc = {
                     $set: { ...user },
                 };
                 await usersCollection.updateOne(filter, updateDoc);
-                userFromDB = await this.get({ _id: ObjectId(id) });
             } else {
-                const result = await usersCollection.insertOne(user);
-                userFromDB = await this.get({
-                    _id: ObjectId(result.insertedId),
-                });
+                if(type === 'update') {
+                    throw new Error('user doesn\'s exists')
+                }
+                console.log(user)
+                try {
+                    const result = await usersCollection.insertOne(user);
+                    console.log(result)
+                } catch (e) {
+                    console.log(e.message)
+                }
+                
+               
             }
-
-            if (!userFromDB?._id) {
-                throw new Error("Updated user not found");
+            console.log('im here')
+            const userFromDB = await this.get({ _id: user._id });
+            console.log(userFromDB)
+            if (!userFromDB) {
+                throw new Error("user not found");
             }
 
             return userFromDB;
@@ -71,8 +69,6 @@ class UserService {
             return user;
         } catch (e) {
             throw new Error(e.message);
-        } finally {
-            await dbClient.close();
         }
     }
 }
