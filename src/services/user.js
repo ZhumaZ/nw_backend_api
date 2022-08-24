@@ -1,6 +1,7 @@
 const dbClient = require("../db");
 const ObjectId = require("mongodb").ObjectId;
 const validator = require("validator");
+const EncryptionService = require('./encrypt')
 class UserService {
     async save(user, type) {
         try {
@@ -14,12 +15,15 @@ class UserService {
                     }
                 }
             }
+
+            const encrptionService = new EncryptionService();
+            user.password = encrptionService.encrypt(user.password);
+
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
             const usersCollection = db.collection("users");
             const userIsPresent = await this.get({ _id: user._id });
 
-            console.log(userIsPresent)
             if (userIsPresent) {
                 if(type === 'register') {
                     throw new Error('user already exists!')
@@ -45,9 +49,7 @@ class UserService {
                 
                
             }
-            console.log('im here')
             const userFromDB = await this.get({ _id: user._id });
-            console.log(userFromDB)
             if (!userFromDB) {
                 throw new Error("user not found");
             }
