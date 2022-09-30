@@ -1,15 +1,15 @@
 const dbClient = require("../db");
 const NotificationService = require("./notification");
 const SessionService = require("./session");
-const EncryptionService = require('./encrypt')
+const EncryptionService = require("./encrypt");
 class AuthService {
     async login(phone, otp, password) {
-        const encrptionService = new EncryptionService()
+        const encrptionService = new EncryptionService();
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            console.log(encrptionService.encrypt(password))
-            const doc = await db.collection("users").findOne({ _id: phone});
+            console.log(encrptionService.encrypt(password));
+            const doc = await db.collection("users").findOne({ _id: phone });
             if (!doc || password !== encrptionService.decrypt(doc.password)) {
                 throw new Error("Phone number and password did not match");
             }
@@ -26,8 +26,9 @@ class AuthService {
     async verify(otp, token) {
         try {
             const sessionService = new SessionService();
-            await sessionService.get({ otp, token });
+            const session = await sessionService.get({ otp, token });
             await sessionService.deleteOTP(otp, token);
+            return session;
         } catch (e) {
             throw new Error(e.message);
         }

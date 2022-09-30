@@ -58,8 +58,8 @@ app.post("/verify", async (req, res) => {
 
     try {
         const authService = new AuthService();
-        await authService.verify(otp, token);
-        res.json({ success: true });
+        const session = await authService.verify(otp, token);
+        res.json(session);
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -75,14 +75,31 @@ app.post("/register", async (req, res) => {
     const userService = new UserService();
 
     try {
-        const user = await userService.save({
+        const user = await userService.save(
+            {
+                _id,
+                name,
+                password,
+                nid,
+                role,
+            },
+            "register"
+        );
+        res.json(user);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.get("/user", async (req, res) => {
+    const _id = req.query.phone;
+    const userService = new UserService();
+    console.log(req.query);
+    try {
+        const user = await userService.get({
             _id,
-            name,
-            password,
-            nid,
-            role,
-        }, 'register');
-        res.json({ user });
+        });
+        res.json(user);
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
