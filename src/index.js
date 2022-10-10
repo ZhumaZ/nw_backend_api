@@ -17,11 +17,7 @@ const OrderService = require("./services/order");
 const ReviewService = require("./services/review");
 const app = express();
 
-app.use(
-    cors({
-        origin: "*",
-    })
-);
+app.use(cors());
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -32,15 +28,7 @@ app.use(bodyParser.json());
 app.use(authMiddleware);
 
 app.get("/", async (req, res) => {
-    await dbClient.connect();
-    const db = dbClient.db("nearwearDB");
-    const cursor = db.collection("users").find({});
-    let user;
-    await cursor.forEach((item) => {
-        user = item;
-    });
-    console.log(user);
-    res.json({ user });
+    res.json({ success: "it is working!!!" });
 });
 
 app.post("/login", async (req, res) => {
