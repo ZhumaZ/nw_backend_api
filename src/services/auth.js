@@ -8,7 +8,6 @@ class AuthService {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            console.log(encrptionService.encrypt(password));
             const doc = await db.collection("users").findOne({ _id: phone });
             if (!doc || password !== encrptionService.decrypt(doc.password)) {
                 throw new Error("Phone number and password did not match");

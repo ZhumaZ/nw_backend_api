@@ -1,40 +1,40 @@
 const dbClient = require("../db");
 const ObjectId = require("mongodb").ObjectId;
 
-class DressService {
-    async save(dress) {
+class OrderService {
+    async save(order) {
         try {
-            for (let key in dress) {
-                if (key !== "_id" && !dress[key]) {
+            for (let key in order) {
+                if (key !== "_id" && !order[key]) {
                     throw new Error(`invalid ${key} property`);
                 }
             }
 
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const dressesCollection = db.collection("dresses");
-            let dressFromDB;
-            if (dress._id) {
-                const id = dress._id;
-                delete dress._id;
+            const ordersCollection = db.collection("orders");
+            let orderFromDB;
+            if (order._id) {
+                const id = order._id;
+                delete order._id;
                 const filter = { _id: ObjectId(id) };
                 const updateDoc = {
-                    $set: { ...dress },
+                    $set: { ...order },
                 };
-                await dressesCollection.updateOne(filter, updateDoc);
-                dressFromDB = await this.get({ _id: ObjectId(id) });
+                await ordersCollection.updateOne(filter, updateDoc);
+                orderFromDB = await this.get({ _id: ObjectId(id) });
             } else {
-                const result = await dressesCollection.insertOne(dress);
-                dressFromDB = await this.get({
+                const result = await ordersCollection.insertOne(order);
+                orderFromDB = await this.get({
                     _id: ObjectId(result.insertedId),
                 });
             }
 
-            if (!dressFromDB?._id) {
-                throw new Error("Updated dress not found");
+            if (!orderFromDB?._id) {
+                throw new Error("Updated order not found");
             }
 
-            return dressFromDB;
+            return orderFromDB;
         } catch (e) {
             throw new Error(e.message);
         } finally {
@@ -46,9 +46,9 @@ class DressService {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const dresssCollection = db.collection("dresses");
-            const dress = await dresssCollection.findOne(query);
-            return dress;
+            const ordersCollection = db.collection("orders");
+            const order = await ordersCollection.findOne(query);
+            return order;
         } catch (e) {
             throw new Error(e.message);
         } finally {
@@ -60,11 +60,11 @@ class DressService {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const dresssCollection = db.collection("dresses");
-            const cursor = await dresssCollection.find(query);
-            let dresses = [];
-            await cursor.forEach((dress) => dresses.push(dress));
-            return dresses;
+            const ordersCollection = db.collection("orders");
+            const cursor = await ordersCollection.find(query);
+            let orders = [];
+            await cursor.forEach((order) => orders.push(order));
+            return orders;
         } catch (e) {
             throw new Error(e.message);
         } finally {
@@ -76,9 +76,9 @@ class DressService {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const dresssCollection = db.collection("dresses");
-            const dress = await dresssCollection.deleteOne(query);
-            return dress;
+            const ordersCollection = db.collection("orders");
+            const order = await ordersCollection.deleteOne(query);
+            return order;
         } catch (e) {
             throw new Error(e.message);
         } finally {
@@ -87,4 +87,4 @@ class DressService {
     }
 }
 
-module.exports = DressService;
+module.exports = OrderService;

@@ -1,40 +1,40 @@
 const dbClient = require("../db");
 const ObjectId = require("mongodb").ObjectId;
 
-class DressService {
-    async save(dress) {
+class MessageService {
+    async save(message) {
         try {
-            for (let key in dress) {
-                if (key !== "_id" && !dress[key]) {
+            for (let key in message) {
+                if (key !== "_id" && !message[key]) {
                     throw new Error(`invalid ${key} property`);
                 }
             }
 
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const dressesCollection = db.collection("dresses");
-            let dressFromDB;
-            if (dress._id) {
-                const id = dress._id;
-                delete dress._id;
+            const messagesCollection = db.collection("messages");
+            let messageFromDB;
+            if (message._id) {
+                const id = message._id;
+                delete message._id;
                 const filter = { _id: ObjectId(id) };
                 const updateDoc = {
-                    $set: { ...dress },
+                    $set: { ...message },
                 };
-                await dressesCollection.updateOne(filter, updateDoc);
-                dressFromDB = await this.get({ _id: ObjectId(id) });
+                await messagesCollection.updateOne(filter, updateDoc);
+                messageFromDB = await this.get({ _id: ObjectId(id) });
             } else {
-                const result = await dressesCollection.insertOne(dress);
-                dressFromDB = await this.get({
+                const result = await messagesCollection.insertOne(message);
+                messageFromDB = await this.get({
                     _id: ObjectId(result.insertedId),
                 });
             }
 
-            if (!dressFromDB?._id) {
-                throw new Error("Updated dress not found");
+            if (!messageFromDB?._id) {
+                throw new Error("Updated message not found");
             }
 
-            return dressFromDB;
+            return messageFromDB;
         } catch (e) {
             throw new Error(e.message);
         } finally {
@@ -46,9 +46,9 @@ class DressService {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const dresssCollection = db.collection("dresses");
-            const dress = await dresssCollection.findOne(query);
-            return dress;
+            const messagesCollection = db.collection("messages");
+            const message = await messagesCollection.findOne(query);
+            return message;
         } catch (e) {
             throw new Error(e.message);
         } finally {
@@ -60,11 +60,11 @@ class DressService {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const dresssCollection = db.collection("dresses");
-            const cursor = await dresssCollection.find(query);
-            let dresses = [];
-            await cursor.forEach((dress) => dresses.push(dress));
-            return dresses;
+            const messagesCollection = db.collection("messages");
+            const cursor = await messagesCollection.find(query);
+            let messages = [];
+            await cursor.forEach((message) => messages.push(message));
+            return messages;
         } catch (e) {
             throw new Error(e.message);
         } finally {
@@ -76,9 +76,9 @@ class DressService {
         try {
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
-            const dresssCollection = db.collection("dresses");
-            const dress = await dresssCollection.deleteOne(query);
-            return dress;
+            const messagesCollection = db.collection("messages");
+            const message = await messagesCollection.deleteOne(query);
+            return message;
         } catch (e) {
             throw new Error(e.message);
         } finally {
@@ -87,4 +87,4 @@ class DressService {
     }
 }
 
-module.exports = DressService;
+module.exports = MessageService;

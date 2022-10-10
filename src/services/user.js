@@ -1,7 +1,7 @@
 const dbClient = require("../db");
 const ObjectId = require("mongodb").ObjectId;
 const validator = require("validator");
-const EncryptionService = require('./encrypt')
+const EncryptionService = require("./encrypt");
 class UserService {
     async save(user, type) {
         try {
@@ -16,19 +16,21 @@ class UserService {
                 }
             }
 
-            const encrptionService = new EncryptionService();
-            user.password = encrptionService.encrypt(user.password);
+            if (type === "register") {
+                const encrptionService = new EncryptionService();
+                user.password = encrptionService.encrypt(user.password);
+            }
 
             await dbClient.connect();
             const db = dbClient.db("nearwearDB");
             const usersCollection = db.collection("users");
             const userIsPresent = await this.get({ _id: user._id });
-
+            const id = user._id;
             if (userIsPresent) {
-                if(type === 'register') {
-                    throw new Error('user already exists!')
+                if (type === "register") {
+                    throw new Error("user already exists!");
                 }
-                const id = user._id;
+
                 delete user._id;
                 const filter = { _id: id };
                 const updateDoc = {
@@ -36,20 +38,18 @@ class UserService {
                 };
                 await usersCollection.updateOne(filter, updateDoc);
             } else {
-                if(type === 'update') {
-                    throw new Error('user doesn\'s exists')
+                if (type === "update") {
+                    throw new Error("user doesn's exists");
                 }
-                console.log(user)
+                console.log("hafaasdada", user);
                 try {
                     const result = await usersCollection.insertOne(user);
-                    console.log(result)
+                    console.log(result);
                 } catch (e) {
-                    console.log(e.message)
+                    console.log(e.message);
                 }
-                
-               
             }
-            const userFromDB = await this.get({ _id: user._id });
+            const userFromDB = await this.get({ _id: id });
             if (!userFromDB) {
                 throw new Error("user not found");
             }
