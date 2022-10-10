@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const authMiddleware = require("./middleware/auth");
 const { generateAccessToken } = require("./utils");
@@ -15,6 +16,12 @@ const MessageService = require("./services/message");
 const OrderService = require("./services/order");
 const ReviewService = require("./services/review");
 const app = express();
+
+app.use(
+    cors({
+        origin: "*",
+    })
+);
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
