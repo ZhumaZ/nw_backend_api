@@ -3,10 +3,12 @@ const jwt = require("jsonwebtoken");
 const whitelistedRoutes = ["/", "/login", "/register"];
 
 const authMiddleware = (req, res, next) => {
-    console.log(req.url);
+    console.log(req.url, whitelistedRoutes);
     if (whitelistedRoutes.includes(req.url)) {
+        console.log("whitelisted");
         next();
     } else {
+        console.log("not whitelisted");
         const authHeader = req.headers["authorization"];
         const token = authHeader && authHeader.split(" ")[1];
 
