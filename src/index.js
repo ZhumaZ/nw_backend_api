@@ -317,6 +317,7 @@ app.put("/order", async (req, res) => {
     const userId = req.body?.userId?.trim();
     const dressId = req.body?.dressId?.trim();
     const status = req.body?.status?.trim();
+    const paymentMethod = req.body?.paymentMethod?.trim();
     const orderedAt = req.body?.orderedAt?.trim();
 
     try {
@@ -325,6 +326,7 @@ app.put("/order", async (req, res) => {
             userId,
             dressId,
             status,
+            paymentMethod,
             orderedAt,
         });
 
@@ -466,7 +468,7 @@ app.delete("/review", async (req, res) => {
     }
 });
 
-// Order endpoints ENDS
+// Review endpoints ENDS
 
 app.listen(process.env.PORT, () => {
     console.log(`Example app listening on port ${process.env.PORT}`);
