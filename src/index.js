@@ -321,6 +321,7 @@ app.put("/order", async (req, res) => {
     const userId = req.body?.userId?.trim();
     const dressId = req.body?.dressId?.trim();
     const dressTitle = req.body?.dressTitle?.trim();
+    const dressImage = req.body?.dressImage?.trim();
     const status = req.body?.status?.trim();
     const paymentMethod = req.body?.paymentMethod?.trim();
     const deliveryAddress = req.body?.deliveryAddress?.trim();
@@ -333,6 +334,7 @@ app.put("/order", async (req, res) => {
             userId,
             dressId,
             dressTitle,
+            dressImage,
             status,
             paymentMethod,
             deliveryAddress,
