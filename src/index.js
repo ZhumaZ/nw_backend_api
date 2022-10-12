@@ -325,6 +325,7 @@ app.put("/order", async (req, res) => {
     const paymentMethod = req.body?.paymentMethod?.trim();
     const deliveryAddress = req.body?.deliveryAddress?.trim();
     const orderedAt = req.body?.orderedAt?.trim();
+    const total = req.body?.total?.trim();
 
     try {
         const orderService = new OrderService();
@@ -335,6 +336,7 @@ app.put("/order", async (req, res) => {
             status,
             paymentMethod,
             deliveryAddress,
+            total,
             orderedAt,
         });
 
