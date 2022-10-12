@@ -163,6 +163,8 @@ app.put("/dress", async (req, res) => {
     const category = req.body?.category?.trim();
     const time = req.body?.time?.trim();
     const price = req.body?.price?.trim();
+    const description = req.body?.description?.trim();
+    const ownerId = req.body?.ownerId?.trim();
 
     try {
         const dressService = new DressService();
@@ -172,6 +174,8 @@ app.put("/dress", async (req, res) => {
             category,
             time,
             price,
+            description,
+            ownerId,
         });
 
         res.json(dress);
@@ -316,6 +320,7 @@ app.delete("/message", async (req, res) => {
 app.put("/order", async (req, res) => {
     const userId = req.body?.userId?.trim();
     const dressId = req.body?.dressId?.trim();
+    const dressTitle = req.body?.dressTitle?.trim();
     const status = req.body?.status?.trim();
     const paymentMethod = req.body?.paymentMethod?.trim();
     const deliveryAddress = req.body?.deliveryAddress?.trim();
@@ -326,6 +331,7 @@ app.put("/order", async (req, res) => {
         const order = await orderService.save({
             userId,
             dressId,
+            dressTitle,
             status,
             paymentMethod,
             deliveryAddress,
